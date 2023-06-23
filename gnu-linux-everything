@@ -1,0 +1,46 @@
+#!/bin/bash
+
+ipkgs_raw=$(apt list --installed 2>/dev/null) # the raw output from the apt command
+ipkgs=() # finished array
+
+
+# prepare $ipkgs
+for ipkg_full in $ipkgs_raw # for every line that apt command returned
+do
+    # if the full line is NOT "Listing..."
+    if [ "$ipkg_full" != "Listing..." ]; then
+
+        # check if the full line contains a slash, because a slash means that the line is the package name, not data about the package
+        if grep -q '/' <<< "$ipkg_full"; then
+            # configure seperator to be a slash
+            IFS='/'
+
+            # split the line
+            read -a ipkg <<< "$ipkg_full"
+
+            # add item to finished array
+            ipkgs+=("${ipkg[0]}")
+        fi
+    fi
+done
+
+# display the start of the message
+echo -n "I'd like to interject for a moment. If you're refering my computer's OS as GNU/Linux, you are incorrect. The OS that my computer runs is in fact, "
+
+# for every item in the packages array that we added to earlier
+for i in "${ipkgs[@]}" 
+do
+    echo -n "$i/" # print the package with a / at the end
+done
+
+printf "GNU/Linux.\n\n" # print the rest of the message
+
+echo "GNU/Linux is not the OS that my computer runs by itself, but rather another free component of a fully functioning computer made useful by the packages that I install from dpkg, apt, and raw executables, comprising a full OS that can do my daily tasks."
+echo
+echo "Many computers run a modified version of the GNU/Linux OS every day, without realizing it. Through a peculiar turn of events, a GNU/Linux system with all it's packages is often called GNU/Linux, and many of it's users are not aware that it is basically a package library with an operating system underneath."
+echo
+echo -n "There really is a GNU/Linux, and these people are using it, but it is just a part of the system they use. GNU/Linux is the OS: The kernel and basic system utilities including package managers, which allow software that you use everyday to be installed. "
+echo -n "The OS is an essential part of a workstation, embedded device, or gaming computer, but almost useless by itself; it can only be used for daily tasks in the context of other packages. GNU/Linux is normally used in combination with software that allow the system to be used for daily tasks: "
+echo "the whole computer is basically GNU/Linux with packages added. So all the so-called GNU/Linux distributions are really distributions of GNU/Linux with packages added on!"
+
+exit 0 # exit with return code of zero, meaning success
